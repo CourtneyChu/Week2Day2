@@ -1,0 +1,28 @@
+{
+  "name": "week2day2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "express_server.js",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "body-parser": "^1.17.2",
+    "cookie": "^0.3.1",
+    "ejs": "^2.5.7",
+    "express": "^4.15.3",
+    "save": "^2.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CourtneyChu/Week2Day2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CourtneyChu/Week2Day2/issues"
+  },
+  "homepage": "https://github.com/CourtneyChu/Week2Day2#readme"
+}
