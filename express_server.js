@@ -90,8 +90,12 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login",  (req, res) => {
-  res.render("login");
-});
+  if (req.session.user_id == undefined) {
+  res.render("login")
+} else {
+  res.redirect("/urls");
+};
+} );
 
 
 app.get("/register", (req, res) => {
@@ -110,15 +114,10 @@ function generateRandomString() {
 // refer here
 app.get("/urls", (req, res) => {
   const userCookie = req.session.user_id
-  //const userCookie = req.cookies["user_ID"];
   if (!userCookie) {
     res.redirect("/login");
   }
   else {
-
-    //const userCookie = req.cookies["user_ID"];
-    // const userCookie = req.session.user_id
-
     var urls = findMyURLS(userCookie);
     console.log(urls);
     var templateVars = {owner: userCookie, users: users, urls: urls}
@@ -138,10 +137,18 @@ function findMyURLS(ID) {
   return myUrls;
 };
 
+function checker(longURL) {
+  if (longURL.includes('http') || longURL.includes('https')) {
+    return longURL
+  } else {
+const newLongURL = ("http://" + longURL);
+  return newLongURL;
+  }
+}
+
 
 app.post("/urls", (req, res) => {
- var newURL = req.body.longURL;
- console.log(newURL);
+ var newURL = checker(req.body.longURL);
  var userId = req.session.user_id;
  var ID = userId
  var shortURL = generateRandomString();
@@ -160,13 +167,6 @@ res.redirect('/urls/');
  }
 });
 
-
-//This should let the user edit the URL and then direct them to the urls directory page
-// what comes in after the req.params and urls/: could have been anything. Represents id or short url in this case
-app.get("/u/:id", (req, res) => {
-var longURL = urlDatabase[req.params.id];
-res.redirect(longURL);
-});
 
 //edits urls
 app.post("/urls/:id", (req, res) => {
@@ -188,11 +188,10 @@ app.post("/logout", (req, res) => {
 app.get("/urls/new", (req, res) => {
  const userCookie = req.session.user_id;
   let templateVars = {owner: userCookie, users: users, urls: urlDatabase}
-
-  if (userCookie) {
-    res.render("urls_new", templateVars);
+if (userCookie) {
+  res.render("urls_new", templateVars);
   } else {
-    res.redirect('/login');
+  res.redirect('/login');
   }
 });
 
@@ -200,11 +199,27 @@ app.get("/", (req, res) => {
 res.redirect("/urls");
 });
 
+app.get("/u/:id", (req, res) => {
+  if (urlDatabase[req.params.id]) {
+    let long = urlDatabase[req.params.id].longURL
+    console.log(long)
+    res.redirect(long)
+  } else {
+    res.status(404).send("This URL does not exist");
+  }
+  });
 
 
 //just rendering the page
 app.get("/urls/:id", (req, res) => {
 const userCookie = req.session.user_id
+  if (userCookie === undefined) {
+  res.status(400).send("You are not logged in")
+  } else if (!urlDatabase[req.params.id]) {
+  res.status(400).send("This is not a short url")
+  } else if (userCookie !== urlDatabase[req.params.id].userID) {
+    res.status(400).send("This URL does not belong to you");
+  }
   let templateVars =  { 'users': users, "owner": userCookie, 'urls': urlDatabase, 'shortURL': req.params.id};
   //{ shortURL: req.params.id, longURL: urlDatabase[req.params.id], user:users[userCookie]};
   res.render("urls_show", templateVars);
