@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
-const cookieSession = require('cookie-session'); // default port 8080
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 
@@ -31,7 +31,6 @@ var urlDatabase = {
   "9sm5xK": {userID: "userRandomID", longURL: "http://www.google.com"}
 };
 
-//posts to register
 app.post("/register", (req, res) => {
   const email = req.body.email;
   for (const user in users) {
@@ -47,28 +46,21 @@ app.post("/register", (req, res) => {
     res.status(400).send("Must have both fields");
   }
   else {
-
     users[ID] = {
       id: ID,
       email: email,
       password: hashed_password
     };
-    console.log("new user",users[ID]);
     const userId = users[ID].id;
-    //res.cookie("user_ID", userId);
     req.session.user_id = userId;
-    //const userCookie = req.cookies["user_ID"];
     const userCookie = req.session.user_id
     var templateVars = {owner: userCookie, users: users, urls: urlDatabase}
-    console.log(templateVars);
     res.redirect("/urls");
   }
 
 });
 
 
-
-//helps us set up the values to the cookie
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -111,7 +103,6 @@ function generateRandomString() {
     return shortURL;
 }
 
-// refer here
 app.get("/urls", (req, res) => {
   const userCookie = req.session.user_id
   if (!userCookie) {
@@ -119,10 +110,7 @@ app.get("/urls", (req, res) => {
   }
   else {
     var urls = findMyURLS(userCookie);
-    console.log(urls);
     var templateVars = {owner: userCookie, users: users, urls: urls}
-
-    //let templateVars = {urls: urls, user :users[userCookie]};
     res.render("urls_index", templateVars);
   }
 });
@@ -156,7 +144,6 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-//this should delete entries
 app.post("/urls/:id/delete", (req, res) => {
   const userCookie = req.session.user_id
    if (userCookie === urlDatabase[req.params.id].userID) {
@@ -168,7 +155,6 @@ res.redirect('/urls/');
 });
 
 
-//edits urls
 app.post("/urls/:id", (req, res) => {
 const userCookie = req.session.user_id
  if (userCookie === urlDatabase[req.params.id].userID) {
@@ -184,7 +170,6 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls');
 });
 
-//handles new urls
 app.get("/urls/new", (req, res) => {
  const userCookie = req.session.user_id;
   let templateVars = {owner: userCookie, users: users, urls: urlDatabase}
@@ -202,15 +187,12 @@ res.redirect("/urls");
 app.get("/u/:id", (req, res) => {
   if (urlDatabase[req.params.id]) {
     let long = urlDatabase[req.params.id].longURL
-    console.log(long)
     res.redirect(long)
   } else {
     res.status(404).send("This URL does not exist");
   }
   });
 
-
-//just rendering the page
 app.get("/urls/:id", (req, res) => {
 const userCookie = req.session.user_id
   if (userCookie === undefined) {
@@ -221,15 +203,12 @@ const userCookie = req.session.user_id
     res.status(400).send("This URL does not belong to you");
   }
   let templateVars =  { 'users': users, "owner": userCookie, 'urls': urlDatabase, 'shortURL': req.params.id};
-  //{ shortURL: req.params.id, longURL: urlDatabase[req.params.id], user:users[userCookie]};
   res.render("urls_show", templateVars);
 });
 
- //urlDatabase[shortURL] = { "owner": ID, "longURL": newURL};
-//this url is now an object of objects
 
 
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`listening on port ${PORT}!`);
 });
