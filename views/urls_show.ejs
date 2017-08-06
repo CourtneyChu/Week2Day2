@@ -9,9 +9,8 @@
 
 <ul>
 
-<li> <%= shortURL %> --> <%= longURL %>
-<form method="POST" action="/urls/<%= shortURL %>/">
-<a href="/urls/<%= shortURL %>"><button>Edit</button></a>
+<li> <%= shortURL %> --> <%= urls[shortURL]['longURL'] %>
+
 
 </form>
 
@@ -19,7 +18,6 @@
       <label for="longURL">Edit Your URL:</label>
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Submit">
-
 </form>
 
 </li>

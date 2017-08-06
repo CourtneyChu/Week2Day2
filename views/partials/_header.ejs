@@ -1,12 +1,12 @@
 <header>
 
-  <% if (user) { %>
+  <% if (users[owner]) { %>
     <h2>
-      <%= user.email %>
+      <%= users[owner]["email"] %>
     </h2>
     <form method="POST" action="/logout">
       <input type="submit" value="Logout"></input>
-    <form>
+    </form>
   <% } else { %>
 <a href="/register">register by clicking here</a>
 <a href="/login"> login by clicking here </a>
