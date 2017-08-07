@@ -32,6 +32,14 @@ var urlDatabase = {
   "9sm5xK": {userID: "userRandomID", longURL: "http://www.google.com"}
 };
 
+function generateRandomString() {
+  var shortURL = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for(var i = 0; i < 6; i++) {
+    shortURL += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return shortURL;
+}
 
 app.post("/register", (req, res) => {
   const email = req.body.email;
@@ -74,8 +82,10 @@ app.post("/login", (req, res) => {
         const userId = users[user].id;
         req.session.user_id = userId;
         res.redirect("/urls");
+        return;
       } else {
         res.status(400).send("There seems to be a problem with your credentials!");
+        return;
       }
     }
   }
@@ -94,15 +104,15 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-function generateRandomString() {
-  var shortURL = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for(var i = 0; i < 6; i++) {
-    shortURL += possible.charAt(Math.floor(Math.random() * possible.length));
+function findMyURLS(ID) {
+  const myUrls = {};
+  for(var z in urlDatabase) {
+    if(urlDatabase[z].userID === ID) {
+      myUrls[z] = urlDatabase[z];
+    }
   }
-  return shortURL;
+  return myUrls;
 }
-
 
 app.get("/urls", (req, res) => {
   const userCookie = req.session.user_id;
@@ -115,17 +125,6 @@ app.get("/urls", (req, res) => {
   }
 });
 
-function findMyURLS(ID) {
-  const myUrls = {};
-  for(var z in urlDatabase) {
-    if(urlDatabase[z].userID === ID) {
-      myUrls[z] = urlDatabase[z];
-    }
-  }
-  return myUrls;
-}
-
-
 function checker(longURL) {
   if (longURL.includes('http') || longURL.includes('https')) {
     return longURL;
@@ -134,7 +133,6 @@ function checker(longURL) {
     return newLongURL;
   }
 }
-
 
 app.post("/urls", (req, res) => {
   var newURL = checker(req.body.longURL);
