@@ -32,24 +32,6 @@ var urlDatabase = {
   "9sm5xK": {userID: "userRandomID", longURL: "http://www.google.com"}
 };
 
-function generateRandomString() {
-  var shortURL = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for(var i = 0; i < 6; i++) {
-    shortURL += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return shortURL;
-}
-
-function findMyURLS(ID) {
-  const myUrls = {};
-  for(var z in urlDatabase) {
-    if(urlDatabase[z].userID === ID) {
-      myUrls[z] = urlDatabase[z];
-    }
-  }
-  return myUrls;
-}
 
 app.post("/register", (req, res) => {
   const email = req.body.email;
@@ -62,7 +44,7 @@ app.post("/register", (req, res) => {
   const ID = generateRandomString();
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  if (password === "" || email === "" ) {
+  if (password == "" || email == "" ) {
     res.status(400).send("Must have both fields");
   } else {
     users[ID] = {
@@ -101,7 +83,7 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login",  (req, res) => {
-  if (req.session.user_id === undefined) {
+  if (req.session.user_id == undefined) {
     res.render("login");
   } else {
     res.redirect("/urls");
@@ -111,6 +93,15 @@ app.get("/login",  (req, res) => {
 app.get("/register", (req, res) => {
   res.render("register");
 });
+
+function generateRandomString() {
+  var shortURL = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for(var i = 0; i < 6; i++) {
+    shortURL += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return shortURL;
+}
 
 
 app.get("/urls", (req, res) => {
@@ -123,6 +114,17 @@ app.get("/urls", (req, res) => {
     res.render("urls_index", templateVars);
   }
 });
+
+function findMyURLS(ID) {
+  const myUrls = {};
+  for(var z in urlDatabase) {
+    if(urlDatabase[z].userID === ID) {
+      myUrls[z] = urlDatabase[z];
+    }
+  }
+  return myUrls;
+}
+
 
 function checker(longURL) {
   if (longURL.includes('http') || longURL.includes('https')) {
@@ -166,7 +168,7 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/logout", (req, res) => {
   req.session.user_id = null;
-  res.redirect('/urls');
+  res.redirect("/login");
 });
 
 app.get("/urls/new", (req, res) => {
@@ -194,7 +196,7 @@ app.get("/u/:id", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const userCookie = req.session.user_id;
-  if (userCookie === undefined) {
+  if (userCookie == undefined) {
     res.status(400).send("You are not logged in");
   } else if (!urlDatabase[req.params.id]) {
     res.status(400).send("This is not a short url");
