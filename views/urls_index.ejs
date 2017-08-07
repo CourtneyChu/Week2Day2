@@ -5,28 +5,16 @@
 </head>
 <h1> welcome to TinyApp! </h1>
 <body>
-
-<% include partials/_header %>
-
-<ul>
-<% for(var item in urls){ %>
-
-<li> <%= item %> : <%= JSON.stringify(urls[item]['longURL']) %> </li>
-<a href="/urls/<%=item %>">Edit</a>
-
-<form method="POST" action="/urls/<%= item %>/delete">
-<input type="submit" value="Delete"></input>
-
-
-</form>
-
-<%}%>
-
-
-
-</ul>
-
-
+  <% include partials/_header %>
+  <ul>
+    <% for(var item in urls){ %>
+      <li> <%= item %> : <%= JSON.stringify(urls[item]['longURL']) %> </li>
+      <a href="/urls/<%=item %>">Edit</a>
+      <form method="POST" action="/urls/<%= item %>/delete">
+        <input type="submit" value="Delete"></input>
+      </form>
+    <%}%>
+  </ul>
 <a href = "/urls/new"> shorten a URL </a>
 </body>
 </html>
